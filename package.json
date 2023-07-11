@@ -1,0 +1,17 @@
+{
+  "name": "take_umbrella_bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "gen:types": "supabase gen types typescript --linked > supabase/functions/_shared/database.types.ts",
+    "set:env": "supabase secrets set --env-file ./.env",
+    "deploy:line": "supabase functions deploy take_umbrella_bot --no-verify-jwt"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "supabase": "^1.75.3",
+    "supabase-cli": "^0.0.21"
+  }
+}
