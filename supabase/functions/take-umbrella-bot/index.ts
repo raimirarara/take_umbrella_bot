@@ -66,7 +66,7 @@ serve(async (req) => {
           const { data } = await supabase.from("user").select("*").eq("user_id", userId).single()
           // 存在しない場合、supabaseのlocationテーブルに位置情報を保存
           if (!data?.location) {
-            await supabase.from("user").insert({ user_id: userId as string, location: region })
+            await supabase.from("user").upsert({ user_id: userId as string, location: region })
             await replyMessage(replyToken, [
               { type: "text", text: `ありがとう。位置情報を${region}で登録したぞ` },
               { type: "text", text: "これから傘が必要になるかどうか(降水確率70%以上)を通知してあげよう！" },
