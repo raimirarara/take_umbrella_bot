@@ -115,7 +115,7 @@ serve(async (req) => {
               },
             ])
           }
-          await replyMessage(replyToken, [{ type: "text", text: `傘が必要なときに通知してやるぞ` }])
+          await replyMessage(replyToken, [{ type: "text", text: `傘が必要なとき(降水確率65%以上)に通知してやるぞ` }])
         }
       }
     })
