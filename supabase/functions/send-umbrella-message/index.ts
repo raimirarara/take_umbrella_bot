@@ -29,9 +29,9 @@ serve(async (req: any) => {
       }
       if (
         weatherData &&
-        (Number(weatherData.rain_probability_morning?.replace("%", "")) >= 65 ||
-          Number(weatherData.rain_probability_night?.replace("%", "")) >= 65 ||
-          Number(weatherData.rain_probability_noon?.replace("%", "")) >= 65)
+        (Number(weatherData.rain_probability_morning?.replace("%", "")) >= 70 ||
+          Number(weatherData.rain_probability_night?.replace("%", "")) >= 70 ||
+          Number(weatherData.rain_probability_noon?.replace("%", "")) >= 70)
       ) {
         // 50%以上の降水確率がある場合の処理
         return pushMessage(user.user_id, [{ type: "text", text: "傘持ってけ！" }])
