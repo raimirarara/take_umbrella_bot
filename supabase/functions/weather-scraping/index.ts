@@ -2,7 +2,7 @@
 import { DOMParser, Element } from "https://deno.land/x/deno_dom@v0.1.38/deno-dom-wasm.ts"
 import axiod from "https://deno.land/x/axiod@0.26.2/mod.ts"
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { ku27 } from "../_shared/Constants.ts"
+import { ku27, tama } from "../_shared/Constants.ts"
 import { supabase } from "../_shared/supabaseClient.ts"
 
 type Forecast = {
@@ -126,6 +126,10 @@ serve(async (req: any) => {
   const today = new Date().toLocaleDateString("ja-JP", { timeZone: "Asia/Tokyo" })
   for (const [region, regionNumber] of Object.entries(ku27)) {
     const reqUrl = `https://tenki.jp/forecast/3/16/4410/131${regionNumber}/`
+    await main(reqUrl, today, region)
+  }
+  for (const [region, regionNumber] of Object.entries(tama)) {
+    const reqUrl = `https://tenki.jp/forecast/3/16/4410/132${regionNumber}/`
     await main(reqUrl, today, region)
   }
   return new Response(today + "の天気をDBに保存しました。", { headers: { "Content-Type": "application/json" } })
