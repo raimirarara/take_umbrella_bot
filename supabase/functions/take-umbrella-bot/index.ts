@@ -36,7 +36,7 @@ serve(async (req) => {
           },
         ]
         // まずuserIdを保存
-        await supabase.from("user").insert({ user_id: userId as string, umbrella_threshold: "40%" })
+        await supabase.from("user").insert({ user_id: userId as string, umbrella_threshold: "60%" })
         await replyMessage(replyToken, reply)
         return
       }
@@ -55,7 +55,7 @@ serve(async (req) => {
           // TODO supabase上に位置情報か存在するかを取得
           const { data } = await supabase.from("user").select("*").eq("user_id", userId).single()
           // 存在しない場合、supabaseのlocationテーブルに位置情報を保存
-          if (!data) {
+          if (!data?.location) {
             await supabase.from("user").insert({ user_id: userId as string, location: region })
             await replyMessage(replyToken, [{ type: "text", text: `ありがとう。位置情報を${region}で登録したぞ` }])
           }
