@@ -2,5 +2,5 @@
   "deno.enable": true,
   "deno.unstable": true,
   "deno.importMap": "./supabase/functions/import_map.json",
-  "cSpell.words": ["SUPABASE"]
+  "cSpell.words": ["postback", "SUPABASE"]
 }

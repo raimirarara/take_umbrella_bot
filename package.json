@@ -6,7 +6,7 @@
   "scripts": {
     "gen:types": "supabase gen types typescript --linked > supabase/functions/_shared/database.types.ts",
     "set:env": "supabase secrets set --env-file ./.env",
-    "deploy:line": "supabase functions deploy take_umbrella_bot --no-verify-jwt"
+    "deploy:line": "supabase functions deploy take-umbrella-bot --no-verify-jwt"
   },
   "author": "",
   "license": "ISC",

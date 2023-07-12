@@ -3,9 +3,11 @@
 // This enables autocomplete, go to definition, etc.
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { LocationMessage, Message, WebhookEvent, WebhookRequestBody } from "https://esm.sh/@line/bot-sdk@7.5.2"
+import { Message, WebhookEvent, WebhookRequestBody } from "https://esm.sh/@line/bot-sdk@7.5.2"
 import { getUserName, replyMessage, validateSignature } from "../_shared/line_utils.ts"
 import { HowToSendLocationUrl } from "../_shared/Constants.ts"
+import { supabase } from "../_shared/supabaseClient.ts"
+import { getRegionFromAddress } from "./getRegionFromAddress.ts"
 
 serve(async (req) => {
   const body: WebhookRequestBody = await req.json()
@@ -33,27 +35,60 @@ serve(async (req) => {
             text: "まずはじめにこのトークでわしに位置情報を送ってくれ！\n" + "送り方: " + HowToSendLocationUrl + "\n",
           },
         ]
+        // まずuserIdを保存
+        await supabase.from("user").insert({ user_id: userId as string, umbrella_threshold: "40%" })
         await replyMessage(replyToken, reply)
         return
+      }
+
+      if (event.type === "postback") {
+        const replyToken = event.replyToken
+        const region = event.postback.data
+        await supabase.from("user").update({ location: region }).eq("user_id", userId)
+        await replyMessage(replyToken, [{ type: "text", text: `位置情報を${region}で登録したぞ` }])
       }
 
       if (event.type === "message") {
         const replyToken = event.replyToken
         if (event.message.type === "location") {
+          const region = getRegionFromAddress(event.message.address)
           // TODO supabase上に位置情報か存在するかを取得
-
+          const { data } = await supabase.from("user").select("*").eq("user_id", userId).single()
           // 存在しない場合、supabaseのlocationテーブルに位置情報を保存
-
+          if (!data) {
+            await supabase.from("user").insert({ user_id: userId as string, location: region })
+            await replyMessage(replyToken, [{ type: "text", text: `ありがとう。位置情報を${region}で登録したぞ` }])
+          }
           // 存在したら上書きするかを確認するメッセージを送信
-
-          // 上書きする場合はsupabaseのlocationテーブルを更新
-
-          const userLocation: LocationMessage = event.message
+          await replyMessage(replyToken, [
+            {
+              type: "template",
+              altText: "this is a confirm template",
+              template: {
+                type: "confirm",
+                text: `位置情報を${data?.location}で登録しているぞ。上書きするか？`,
+                actions: [
+                  {
+                    type: "postback",
+                    label: "Yes",
+                    data: region,
+                  },
+                  {
+                    type: "message",
+                    label: "No",
+                    text: "しない",
+                  },
+                ],
+              },
+            },
+          ])
+        }
+        if (event.message.type === "text") {
+          await replyMessage(replyToken, [{ type: "text", text: `傘が必要なときに通知してやるぞ` }])
         }
       }
     })
   )
-
   return new Response("done.", { headers: { "Content-Type": "application/json" } })
 })
 
