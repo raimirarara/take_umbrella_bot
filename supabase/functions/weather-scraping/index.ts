@@ -1,6 +1,9 @@
 // Importing necessary libraries
-import { DOMParser, Element } from "https://deno.land/x/deno_dom/deno-dom-wasm.ts"
-import axiod from "https://deno.land/x/axiod/mod.ts"
+import { DOMParser, Element } from "https://deno.land/x/deno_dom@v0.1.38/deno-dom-wasm.ts"
+import axiod from "https://deno.land/x/axiod@0.26.2/mod.ts"
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { ku27 } from "../_shared/Constants.ts"
+import { supabase } from "../_shared/supabaseClient.ts"
 
 type Forecast = {
   date: string
@@ -13,7 +16,7 @@ type Forecast = {
   wind_wave: string
 }
 
-async function main(url: string) {
+async function main(url: string, date: string, region: string) {
   // Fetch and parse HTML
   const doc = await fetchHTML(url)
 
@@ -23,21 +26,45 @@ async function main(url: string) {
   const locationPattern = /(.+)の今日明日の天気/
   const location = doc.querySelector("title")?.textContent
   dict["location"] = location?.match(locationPattern)?.[1]
-  console.log(`${dict["location"]}の天気`)
+  if (region != dict["location"]) {
+    throw new Error("tenki.jpの地域名と呼出し地域が一致していません。tenki.jpのHTML構造が変わったかもしれません。")
+  }
 
   const todayForecastEl = doc.querySelector(".today-weather")
-  const tomorrowForecastEl = doc.querySelector(".tomorrow-weather")
+  // const tomorrowForecastEl = doc.querySelector(".tomorrow-weather")
 
-  if (todayForecastEl) {
-    dict["today"] = [await extractForecast(todayForecastEl)]
+  if (!todayForecastEl) throw new Error("Failed to extract today's forecast")
+
+  const data = extractForecast(todayForecastEl)
+
+  const insertData: {
+    date: string
+    high_temp?: string | null
+    high_temp_diff?: string | null
+    location: string
+    low_temp?: string | null
+    low_temp_diff?: string | null
+    rain_probability_morning?: string | null
+    rain_probability_night?: string | null
+    rain_probability_noon?: string | null
+    weather?: string | null
+    wind_wave?: string | null
+  } = {
+    date: date,
+    high_temp: data.high_temp,
+    high_temp_diff: data.high_temp_diff,
+    location: region,
+    low_temp: data.low_temp,
+    low_temp_diff: data.low_temp_diff,
+    rain_probability_morning: data.rain_probability["06-12"],
+    rain_probability_noon: data.rain_probability["12-18"],
+    rain_probability_night: data.rain_probability["18-24"],
+    weather: data.weather,
+    wind_wave: data.wind_wave,
   }
 
-  if (tomorrowForecastEl) {
-    dict["tomorrow"] = [await extractForecast(tomorrowForecastEl)]
-  }
-
-  // Print JSON output
-  // console.log(JSON.stringify(dict, null, 2));
+  const { error } = await supabase.from("weather").upsert(insertData)
+  if (error) throw error
 }
 
 async function fetchHTML(url: string) {
@@ -46,7 +73,7 @@ async function fetchHTML(url: string) {
   return parser.parseFromString(res.data, "text/html")!
 }
 
-async function extractForecast(soup: Element): Promise<Forecast> {
+function extractForecast(soup: Element): Forecast {
   // Extract date
   const datePattern = /(\d+)月(\d+)日\(([土日月火水木金])+\)/
   const dateMatch = soup.querySelector(".left-style")?.textContent?.match(datePattern)
@@ -92,5 +119,14 @@ async function extractForecast(soup: Element): Promise<Forecast> {
   return data
 }
 
-// Invoke the main function
-main("https://tenki.jp/forecast/3/16/4410/13112/")
+serve(async (req: any) => {
+  // Invoke the main function
+  // console.log(req.json())
+  // const region = req.json().region as string
+  const today = new Date().toLocaleDateString("ja-JP", { timeZone: "Asia/Tokyo" })
+  for (const [region, regionNumber] of Object.entries(ku27)) {
+    const reqUrl = `https://tenki.jp/forecast/3/16/4410/131${regionNumber}/`
+    await main(reqUrl, today, region)
+  }
+  return new Response(today + "の天気をDBに保存しました。", { headers: { "Content-Type": "application/json" } })
+})

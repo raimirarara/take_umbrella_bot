@@ -34,7 +34,66 @@ export interface Database {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      user: {
+        Row: {
+          location: string | null
+          umbrella_threshold: string | null
+          user_id: string
+        }
+        Insert: {
+          location?: string | null
+          umbrella_threshold?: string | null
+          user_id: string
+        }
+        Update: {
+          location?: string | null
+          umbrella_threshold?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      weather: {
+        Row: {
+          date: string
+          high_temp: string | null
+          high_temp_diff: string | null
+          location: string
+          low_temp: string | null
+          low_temp_diff: string | null
+          rain_probability_morning: string | null
+          rain_probability_night: string | null
+          rain_probability_noon: string | null
+          weather: string | null
+          wind_wave: string | null
+        }
+        Insert: {
+          date: string
+          high_temp?: string | null
+          high_temp_diff?: string | null
+          location: string
+          low_temp?: string | null
+          low_temp_diff?: string | null
+          rain_probability_morning?: string | null
+          rain_probability_night?: string | null
+          rain_probability_noon?: string | null
+          weather?: string | null
+          wind_wave?: string | null
+        }
+        Update: {
+          date?: string
+          high_temp?: string | null
+          high_temp_diff?: string | null
+          location?: string
+          low_temp?: string | null
+          low_temp_diff?: string | null
+          rain_probability_morning?: string | null
+          rain_probability_night?: string | null
+          rain_probability_noon?: string | null
+          weather?: string | null
+          wind_wave?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

@@ -7,8 +7,6 @@ import { LocationMessage, Message, WebhookEvent, WebhookRequestBody } from "http
 import { getUserName, replyMessage, validateSignature } from "../_shared/line_utils.ts"
 import { HowToSendLocationUrl } from "../_shared/Constants.ts"
 
-console.log("Hello from Functions!")
-
 serve(async (req) => {
   const body: WebhookRequestBody = await req.json()
 
@@ -28,7 +26,7 @@ serve(async (req) => {
         const reply: Message[] = [
           {
             type: "text",
-            text: `${username}さん、フォローありがとう！\n` + "これから傘が必要かどうか教えてやろう！\n",
+            text: `${username}くん、フォローありがとう！\n` + "これから傘が必要に通知してあげよう！\n",
           },
           {
             type: "text",
