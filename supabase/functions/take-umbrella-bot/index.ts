@@ -5,7 +5,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { Message, WebhookEvent, WebhookRequestBody } from "https://esm.sh/@line/bot-sdk@7.5.2"
 import { getUserName, replyMessage, validateSignature } from "../_shared/line_utils.ts"
-import { HowToSendLocationUrl } from "../_shared/Constants.ts"
 import { supabase } from "../_shared/supabaseClient.ts"
 import { getRegionFromAddress } from "./getRegionFromAddress.ts"
 
@@ -32,7 +31,15 @@ serve(async (req) => {
           },
           {
             type: "text",
-            text: "まずはじめにこのトークでわしに位置情報を送ってくれ！\n" + "送り方: " + HowToSendLocationUrl + "\n",
+            text: "まずはじめにこのトークでわしに位置情報を送ってくれ！",
+            quickReply: {
+              items: [
+                {
+                  type: "action",
+                  action: { type: "location", label: "Location" },
+                },
+              ],
+            },
           },
         ]
         // まずuserIdを保存
@@ -52,7 +59,7 @@ serve(async (req) => {
         const replyToken = event.replyToken
         if (event.message.type === "location") {
           const region = getRegionFromAddress(event.message.address)
-          // TODO supabase上に位置情報か存在するかを取得
+          // supabase上に位置情報か存在するかを取得
           const { data } = await supabase.from("user").select("*").eq("user_id", userId).single()
           // 存在しない場合、supabaseのlocationテーブルに位置情報を保存
           if (!data?.location) {
@@ -84,6 +91,24 @@ serve(async (req) => {
           ])
         }
         if (event.message.type === "text") {
+          // supabase上で位置情報が登録されていない場合、位置情報を登録するように促す
+          const { data } = await supabase.from("user").select("*").eq("user_id", userId).single()
+          if (!data?.location) {
+            await replyMessage(replyToken, [
+              {
+                type: "text",
+                text: "わしに位置情報を送ってくれ！",
+                quickReply: {
+                  items: [
+                    {
+                      type: "action",
+                      action: { type: "location", label: "Location" },
+                    },
+                  ],
+                },
+              },
+            ])
+          }
           await replyMessage(replyToken, [{ type: "text", text: `傘が必要なときに通知してやるぞ` }])
         }
       }
