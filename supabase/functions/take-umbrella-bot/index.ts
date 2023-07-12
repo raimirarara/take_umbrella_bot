@@ -97,6 +97,8 @@ serve(async (req) => {
                 },
               },
             ])
+          } else {
+            await replyMessage(replyToken, [{ type: "text", text: "そこの位置情報はすでに登録されているぞ" }])
           }
         }
         if (event.message.type === "text") {
