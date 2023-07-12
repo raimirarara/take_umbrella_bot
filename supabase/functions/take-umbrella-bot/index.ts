@@ -52,7 +52,10 @@ serve(async (req) => {
         const replyToken = event.replyToken
         const region = event.postback.data
         await supabase.from("user").update({ location: region }).eq("user_id", userId)
-        await replyMessage(replyToken, [{ type: "text", text: `位置情報を${region}で登録したぞ` }])
+        await replyMessage(replyToken, [
+          { type: "text", text: `位置情報を${region}で登録したぞ` },
+          { type: "text", text: "これから傘が必要になるかどうか(降水確率65%以上)を通知してあげよう！" },
+        ])
       }
 
       if (event.type === "message") {
