@@ -73,28 +73,31 @@ serve(async (req) => {
             ])
           }
           // 存在したら上書きするかを確認するメッセージを送信
-          await replyMessage(replyToken, [
-            {
-              type: "template",
-              altText: "this is a confirm template",
-              template: {
-                type: "confirm",
-                text: `位置情報を${data?.location}で登録しているぞ。上書きするか？`,
-                actions: [
-                  {
-                    type: "postback",
-                    label: "Yes",
-                    data: region,
-                  },
-                  {
-                    type: "message",
-                    label: "No",
-                    text: "しない",
-                  },
-                ],
+          // 別のregionを提示されていれば上書きする
+          if (data?.location !== region) {
+            await replyMessage(replyToken, [
+              {
+                type: "template",
+                altText: "this is a confirm template",
+                template: {
+                  type: "confirm",
+                  text: `位置情報を${data?.location}で登録しているぞ。${region}で上書きするか？`,
+                  actions: [
+                    {
+                      type: "postback",
+                      label: "Yes",
+                      data: region,
+                    },
+                    {
+                      type: "message",
+                      label: "No",
+                      text: "しない",
+                    },
+                  ],
+                },
               },
-            },
-          ])
+            ])
+          }
         }
         if (event.message.type === "text") {
           // supabase上で位置情報が登録されていない場合、位置情報を登録するように促す
