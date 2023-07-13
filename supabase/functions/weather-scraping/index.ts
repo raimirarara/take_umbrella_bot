@@ -123,13 +123,17 @@ serve(async (req: any) => {
   // Invoke the main function
   // console.log(req.json())
   // const region = req.json().region as string
+
+  const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
   const today = new Date().toLocaleDateString("ja-JP", { timeZone: "Asia/Tokyo" })
   for (const [region, regionNumber] of Object.entries(ku27)) {
     const reqUrl = `https://tenki.jp/forecast/3/16/4410/131${regionNumber}/`
+    await delay(500)
     await main(reqUrl, today, region)
   }
   for (const [region, regionNumber] of Object.entries(tama)) {
     const reqUrl = `https://tenki.jp/forecast/3/16/4410/132${regionNumber}/`
+    await delay(500)
     await main(reqUrl, today, region)
   }
   return new Response(today + "の天気をDBに保存しました。", { headers: { "Content-Type": "application/json" } })
