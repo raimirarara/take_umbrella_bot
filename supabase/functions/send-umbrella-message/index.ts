@@ -27,12 +27,12 @@ serve(async (req: any) => {
         console.error(weatherError)
         throw weatherError
       }
-      if (
-        weatherData &&
-        (Number(weatherData.rain_probability_morning?.replace("%", "")) >= 60 ||
-          Number(weatherData.rain_probability_night?.replace("%", "")) >= 70 ||
-          Number(weatherData.rain_probability_noon?.replace("%", "")) >= 60)
-      ) {
+
+      const rainProbabilityMorning = getRainProbability(weatherData.rain_probability_morning)
+      const rainProbabilityNoon = getRainProbability(weatherData.rain_probability_noon)
+      const rainProbabilityNight = getRainProbability(weatherData.rain_probability_night)
+
+      if (rainProbabilityMorning >= 60 || rainProbabilityNoon >= 60 || rainProbabilityNight >= 70) {
         // 50%以上の降水確率がある場合の処理
         return pushMessage(user.user_id, [{ type: "text", text: "傘持ってけ！" }])
       } else {
@@ -44,3 +44,8 @@ serve(async (req: any) => {
 
   return new Response("必要な人に「傘持ってけ！」と送りました", { headers: { "Content-Type": "application/json" } })
 })
+
+function getRainProbability(probabilityString: string | null): number {
+  const probability = Number(probabilityString?.replace("%", ""))
+  return isNaN(probability) ? 0 : probability
+}
