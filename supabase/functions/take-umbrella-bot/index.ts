@@ -43,7 +43,7 @@ serve(async (req) => {
           },
         ]
         // まずuserIdを保存
-        await supabase.from("user").insert({ user_id: userId as string, umbrella_threshold: "60%" })
+        await supabase.from("user").insert({ user_id: userId as string, umbrella_threshold: "70%" })
         await replyMessage(replyToken, reply)
         return
       }
