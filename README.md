@@ -6,4 +6,5 @@ bot_id : @021uugqg
 
 
 ## 傘が必要な日の朝8時に「傘持ってけ！」とメッセージをくれます！
-![image](https://github.com/raimirarara/take_umbrella_bot/assets/68259235/732456d4-6184-4c81-84a0-7013a4b66640)
+![image](https://github.com/raimirarara/take_umbrella_bot/assets/68259235/bcef472c-5736-497d-8439-95394c3957b9)
+
