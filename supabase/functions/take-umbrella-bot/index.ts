@@ -43,7 +43,7 @@ serve(async (req) => {
           },
         ]
         // まずuserIdを保存
-        await supabase.from("user").insert({ user_id: userId as string, umbrella_threshold: "70%" })
+        await supabase.from("user").insert({ user_id: userId as string, umbrella_threshold: "80%" })
         await replyMessage(replyToken, reply)
         return
       }
@@ -54,7 +54,7 @@ serve(async (req) => {
         await supabase.from("user").update({ location: region }).eq("user_id", userId)
         await replyMessage(replyToken, [
           { type: "text", text: `位置情報を${region}で登録したぞ` },
-          { type: "text", text: "これから傘が必要になるかどうか(降水確率70%以上)を通知してあげよう！" },
+          { type: "text", text: "これから傘が必要になるかどうか(降水確率80%以上)を通知してあげよう！" },
         ])
       }
 
@@ -69,7 +69,7 @@ serve(async (req) => {
             await supabase.from("user").upsert({ user_id: userId as string, location: region })
             await replyMessage(replyToken, [
               { type: "text", text: `ありがとう。位置情報を${region}で登録したぞ` },
-              { type: "text", text: "これから傘が必要になるかどうか(降水確率70%以上)を通知してあげよう！" },
+              { type: "text", text: "これから傘が必要になるかどうか(降水確率80%以上)を通知してあげよう！" },
             ])
           }
           // 存在したら上書きするかを確認するメッセージを送信
@@ -120,7 +120,7 @@ serve(async (req) => {
               },
             ])
           } else {
-            await replyMessage(replyToken, [{ type: "text", text: `傘が必要なとき(降水確率70%以上)に通知してやるぞ` }])
+            await replyMessage(replyToken, [{ type: "text", text: `傘が必要なとき(降水確率80%以上)に通知してやるぞ` }])
           }
         }
       }

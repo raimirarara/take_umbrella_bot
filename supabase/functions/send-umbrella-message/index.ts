@@ -32,7 +32,7 @@ serve(async (req: any) => {
       const rainProbabilityNoon = getRainProbability(weatherData.rain_probability_noon)
       const rainProbabilityNight = getRainProbability(weatherData.rain_probability_night)
 
-      if (rainProbabilityMorning >= 70 || rainProbabilityNoon >= 70 || rainProbabilityNight >= 70) {
+      if (rainProbabilityMorning >= 80 || rainProbabilityNoon >= 80 || rainProbabilityNight >= 80) {
         // 50%以上の降水確率がある場合の処理
         return pushMessage(user.user_id, [{ type: "text", text: "傘持ってけ！" }])
       } else {
